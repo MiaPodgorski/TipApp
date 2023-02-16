@@ -56,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
                 String bill = billInput.getText().toString();
                 double Bill = Double.parseDouble(bill);
                 double tip = seekBar.getProgress();
-                tipPercent.setText("tip " + i + "%" + "or $" + (Bill * (tip / 100)));
+                double dollarTip= (Bill * (tip / 100));
+                tipPercent.setText("tip " + i + "%" + "or $" + String.format("%.2",dollarTip));
                 total.setText("total $" + (Bill + (Bill * (tip / 100))));
                 String party = partySize.getText().toString();
                 double Party = Double.parseDouble(party);
@@ -90,8 +91,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //when split bill selected divide total by party size
-        // (splitText.getText().toString().equals("")) checking if empty did not figure out
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
@@ -113,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -122,7 +122,33 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-        private void updateTip(){
+        private void calculateBill() {
+            try {
+                String bill = billInput.getText().toString();
+                double Bill = Double.parseDouble(bill);
+                double tip = seekBar.getProgress();
+                double calc = (Bill + (Bill * (tip / 100)));
+                total.setText("total $" + String.format("%.2",calc));
+            } catch(NumberFormatException ex) {
+                total.setText("fill out all boxes");
+            }
+        }
+
+        private void splitBill() {
+            try {
+                String party = partySize.getText().toString();
+                double Party = Double.parseDouble(party);
+                String bill = billInput.getText().toString();
+                double Bill = Double.parseDouble(bill);
+                double tip = seekBar.getProgress();
+                double calc = ((Bill + (Bill * (tip / 100))) / Party);
+                splitText.setText("$" + String.format("%.2",calc) + " per person");
+            } catch (NumberFormatException ex) {
+                total.setText("fill out all boxes");
+            }
+        }
+
+        private void update(){
             SharedPreferences sp = getSharedPreferences("shared", MODE_PRIVATE);
            int tip =sp.getInt("tip default",15);
            seekBar.setProgress(tip);
@@ -136,7 +162,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onResume(){
             super.onResume();
-            updateTip();
+            update();
         }
-
     }
